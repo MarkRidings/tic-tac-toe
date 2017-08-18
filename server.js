@@ -12,7 +12,6 @@ app.use(express.static(path.join(__dirname, 'node_modules/core-js/**/*')));
 app.use(express.static(path.join(__dirname, 'node_modules/zone-js/**/*')));
 app.use(express.static(path.join(__dirname, 'node_modules/systemjs/**/*')));
 
-
 app.listen(PORT, function (err) {
     if (err) {
         console.log('err');
