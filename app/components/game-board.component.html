@@ -1,0 +1,6 @@
+<div class="container">
+    <game-row *ngFor="let rowNum of rowNumbers"
+              [isCenter]="rowNum === 1"
+              [rowNumber]="rowNum">
+    </game-row>
+</div>
