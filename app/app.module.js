@@ -12,16 +12,22 @@ var game_board_component_1 = require("./components/game-board.component");
 var cell_component_1 = require("./components/cell/cell.component");
 var row_component_1 = require("./components/row/row.component");
 var game_functions_service_1 = require("./services/game-functions.service");
+var start_menu_component_1 = require("./components/start-menu/start-menu.component");
+var forms_1 = require("@angular/forms");
 var AppModule = /** @class */ (function () {
     function AppModule() {
     }
     AppModule = __decorate([
         core_1.NgModule({
-            imports: [platform_browser_1.BrowserModule],
+            imports: [
+                platform_browser_1.BrowserModule,
+                forms_1.FormsModule
+            ],
             declarations: [
                 game_board_component_1.GameBoardComponent,
                 cell_component_1.CellComponent,
-                row_component_1.RowComponent
+                row_component_1.RowComponent,
+                start_menu_component_1.StartMenuComponent
             ],
             providers: [
                 game_functions_service_1.GameFunctionsService

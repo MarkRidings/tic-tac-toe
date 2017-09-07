@@ -14,7 +14,9 @@ var constants_1 = require("../constants");
 var BehaviorSubject_1 = require("rxjs/BehaviorSubject");
 var GameState = /** @class */ (function () {
     function GameState() {
-        this.currentPlayer = constants_1.Constants.PLAYER_X;
+        this.gameType = 1;
+        this.aiDiff = '';
+        this.currentPlayer = constants_1.Constants.NO_PLAYER;
         this.rows = [];
         for (var i = 0; i < constants_1.Constants.NUM_ROWS; i++) {
             var aux = [];
@@ -85,13 +87,16 @@ var GameFunctionsService = /** @class */ (function () {
                 this.moveToNextPlayer();
             }
             else {
-                console.log('in else');
                 this.gameState.next(this.gameState.value);
-                console.log('updated state');
                 alert("Winner: " + this.gameState.value.currentPlayer);
-                console.log('did alert');
             }
         }
+    };
+    GameFunctionsService.prototype.startGame = function (gameType, aiDiff) {
+        this.gameState.value.currentPlayer = constants_1.Constants.PLAYER_X;
+        this.gameState.value.gameType = gameType;
+        this.gameState.value.aiDiff = aiDiff;
+        this.gameState.next(this.gameState.value);
     };
     GameFunctionsService = __decorate([
         core_1.Injectable(),

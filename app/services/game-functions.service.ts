@@ -4,11 +4,15 @@ import {Constants} from "../constants";
 import {BehaviorSubject} from "rxjs/BehaviorSubject";
 
 class GameState {
+    gameType: number;
+    aiDiff: string;
     currentPlayer: number;
     rows: number[][];
 
     constructor() {
-        this.currentPlayer = Constants.PLAYER_X;
+        this.gameType = 1;
+        this.aiDiff = '';
+        this.currentPlayer = Constants.NO_PLAYER;
         this.rows = [];
 
         for (let i = 0; i < Constants.NUM_ROWS; i++) {
@@ -91,13 +95,16 @@ export class GameFunctionsService {
                 this.moveToNextPlayer();
             }
             else {
-                console.log('in else');
                 this.gameState.next(this.gameState.value);
-                console.log('updated state');
                 alert(`Winner: ${this.gameState.value.currentPlayer}`);
-                console.log('did alert');
-
             }
         }
+    }
+
+    startGame(gameType: number, aiDiff: String) {
+        this.gameState.value.currentPlayer = Constants.PLAYER_X;
+        this.gameState.value.gameType = gameType;
+        this.gameState.value.aiDiff = aiDiff;
+        this.gameState.next(this.gameState.value);
     }
 }
