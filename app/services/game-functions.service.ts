@@ -15,23 +15,29 @@ export class GameFunctionsService {
     }
 
     startGame(gameType: number, aiDiff: string, humanAs: string) {
+        
         this.gameStateStore.refreshState(gameType, aiDiff, humanAs);
 
-        if (this.gameState.value.humanAs === Constants.PLAYER_O) {
+        if (this.gameStateStore.getGameType() === Constants.SINGLE_PLAYER && this.gameStateStore.getHumanAs() === Constants.PLAYER_O) {
             this.makeAiMove();
         }
     }
 
     makePlayerMove(rowNumber: number, colNumber: number): void {
+        
         if (this.gameStateStore.isHumansTurn() && this.gameStateStore.isCellEmpty(rowNumber, colNumber)) {
-            this.gameStateStore.updateGameBoard(rowNumber, colNumber, 'human');
-
+            
+            this.gameStateStore.updateGameBoard(rowNumber, colNumber);
+            
             if (this.checkForWinner()) {
+                this.gameStateStore.markGameAsOver();
                 alert(`Winner: ${this.gameStateStore.getCurrentPlayer()}`);
             }
             else {
                 this.gameStateStore.updateNextPlayer();
-                this.makeAiMove();
+                if (this.gameStateStore.getGameType() === Constants.SINGLE_PLAYER) {
+                    this.makeAiMove();
+                }
             }
         }
     }
@@ -43,15 +49,23 @@ export class GameFunctionsService {
 
         if (aiMove[0] === -1) {
             setTimeout(this.announceTie, 500);
+            this.gameStateStore.markGameAsOver();
             return;
         }
 
-        this.gameStateStore.updateGameBoard(aiMove[0], aiMove[1], 'computer');
+        this.gameStateStore.updateGameBoard(aiMove[0], aiMove[1]);
 
         if (!this.checkForWinner()) {
-            this.gameStateStore.updateNextPlayer();
+            if (!this.checkForTie()) {
+                this.gameStateStore.updateNextPlayer();
+            }
+            else {
+                this.gameStateStore.markGameAsOver();
+                setTimeout(this.announceTie(), 500);
+            }
         }
         else {
+            this.gameStateStore.markGameAsOver();
             alert(`Winner: ${this.gameState.value.computerAs}`);
         }
     }
@@ -62,6 +76,10 @@ export class GameFunctionsService {
 
     checkForWinner(): boolean {
         return this.checkRows() || this.checkCols() || this.checkDiags();
+    }
+    
+    checkForTie(): boolean {
+        
     }
 
     checkRows(): boolean {

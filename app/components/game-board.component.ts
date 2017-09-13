@@ -11,6 +11,7 @@ export class GameBoardComponent implements OnInit {
 
     public rowNumbers: number[];
     private gameInProgress: boolean = false;
+    private gameOver: boolean = true;
 
     constructor(private gameStateStore: GameStateStore) {
         this.rowNumbers = Array(Constants.NUM_ROWS).fill().map((x, i) => i);
@@ -19,6 +20,15 @@ export class GameBoardComponent implements OnInit {
     ngOnInit() {
         this.gameStateStore.getAsObservable().subscribe(state => {
             this.gameInProgress = state.currentPlayer !== Constants.NO_PLAYER;
+            this.gameOver = !state.inProgress;
         });
+    }
+
+    restartGame(): void {
+        this.gameStateStore.restartGame();
+    }
+    
+    backToMenu(): void {
+        this.gameStateStore.backToMenu();
     }
 }

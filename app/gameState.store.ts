@@ -10,6 +10,7 @@ class GameState {
     humanAs: string;
     computerAs: string;
     currentPlayer: string;
+    inProgress: boolean;
     rows: number[][];
 
     constructor() {
@@ -18,6 +19,7 @@ class GameState {
         this.humanAs = '';
         this.computerAs = '';
         this.currentPlayer = Constants.NO_PLAYER;
+        this.inProgress = false;
         this.clearRows();
     }
 
@@ -38,6 +40,7 @@ class GameState {
             Constants.PLAYER_O : Constants.PLAYER_X;
 
         this.clearRows();
+        this.inProgress = true;
     }
 
     clearRows() {
@@ -68,10 +71,16 @@ export class GameStateStore {
         this.updateGameState();
     }
 
-    getGameState(): GameState {
-        return this.gameState;
+    restartGame() {
+        this.gameState.init(this.gameState.gameType, this.gameState.aiDiff, this.gameState.humanAs);
+        this.updateGameState();
     }
-
+    
+    backToMenu() {
+        this.gameState.currentPlayer = Constants.NO_PLAYER;
+        this.updateGameState();
+    }
+    
     getAsObservable(): Observable<GameState> {
         return this.gameState$.asObservable();
     }
@@ -82,6 +91,14 @@ export class GameStateStore {
 
     getCurrentPlayer(): string {
         return this.gameState.currentPlayer;
+    }
+    
+    getGameType(): string {
+        return this.gameState.gameType;
+    }
+    
+    getHumanAs(): string {
+        return this.gameState.humanAs;
     }
 
     getAiDifficulty(): string {
@@ -100,10 +117,8 @@ export class GameStateStore {
         this.gameState$.next(this.gameState);
     }
 
-    updateGameBoard(rowIndex: number, colIndex: number, player: string): void {
-        this.gameState.rows[rowIndex][colIndex] = player === 'human' ?
-            this.gameState.humanAs : this.gameState.computerAs;
-
+    updateGameBoard(rowIndex: number, colIndex: number): void {
+        this.gameState.rows[rowIndex][colIndex] = this.gameState.currentPlayer;
         this.updateGameState();
     }
 
@@ -114,6 +129,11 @@ export class GameStateStore {
         this.updateGameState();
     }
 
+    markGameAsOver(): void {
+        this.gameState.inProgress = false;
+        this.updateGameState();
+    }
+    
     isHumansTurn(): boolean {
         return this.gameState.gameType === Constants.TWO_PLAYER || this.gameState.currentPlayer === this.gameState.humanAs;
     }

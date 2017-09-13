@@ -16,13 +16,21 @@ var GameBoardComponent = /** @class */ (function () {
     function GameBoardComponent(gameStateStore) {
         this.gameStateStore = gameStateStore;
         this.gameInProgress = false;
+        this.gameOver = true;
         this.rowNumbers = Array(constants_1.Constants.NUM_ROWS).fill().map(function (x, i) { return i; });
     }
     GameBoardComponent.prototype.ngOnInit = function () {
         var _this = this;
         this.gameStateStore.getAsObservable().subscribe(function (state) {
             _this.gameInProgress = state.currentPlayer !== constants_1.Constants.NO_PLAYER;
+            _this.gameOver = !state.inProgress;
         });
+    };
+    GameBoardComponent.prototype.restartGame = function () {
+        this.gameStateStore.restartGame();
+    };
+    GameBoardComponent.prototype.backToMenu = function () {
+        this.gameStateStore.backToMenu();
     };
     GameBoardComponent = __decorate([
         core_1.Component({

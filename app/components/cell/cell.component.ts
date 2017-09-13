@@ -24,8 +24,6 @@ export class CellComponent implements OnInit {
 
     ngOnInit() {
         this.gameStateSubscription = this.gameStateStore.getAsObservable().subscribe(state => {
-            console.log('in subscribe: ', state);
-
             switch (state.rows[this.rowNumber][this.colNumber]) {
                 case Constants.PLAYER_X:
                     this.cellValue = 'X';

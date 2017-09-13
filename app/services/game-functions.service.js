@@ -23,19 +23,22 @@ var GameFunctionsService = /** @class */ (function () {
     };
     GameFunctionsService.prototype.startGame = function (gameType, aiDiff, humanAs) {
         this.gameStateStore.refreshState(gameType, aiDiff, humanAs);
-        if (this.gameState.value.humanAs === constants_1.Constants.PLAYER_O) {
+        if (this.gameStateStore.getGameType() === constants_1.Constants.SINGLE_PLAYER && this.gameStateStore.getHumanAs() === constants_1.Constants.PLAYER_O) {
             this.makeAiMove();
         }
     };
     GameFunctionsService.prototype.makePlayerMove = function (rowNumber, colNumber) {
         if (this.gameStateStore.isHumansTurn() && this.gameStateStore.isCellEmpty(rowNumber, colNumber)) {
-            this.gameStateStore.updateGameBoard(rowNumber, colNumber, 'human');
+            this.gameStateStore.updateGameBoard(rowNumber, colNumber);
             if (this.checkForWinner()) {
+                this.gameStateStore.markGameAsOver();
                 alert("Winner: " + this.gameStateStore.getCurrentPlayer());
             }
             else {
                 this.gameStateStore.updateNextPlayer();
-                this.makeAiMove();
+                if (this.gameStateStore.getGameType() === constants_1.Constants.SINGLE_PLAYER) {
+                    this.makeAiMove();
+                }
             }
         }
     };
@@ -45,13 +48,21 @@ var GameFunctionsService = /** @class */ (function () {
             this.aiService.makeHardMove(this.gameStateStore.getGameBoard());
         if (aiMove[0] === -1) {
             setTimeout(this.announceTie, 500);
+            this.gameStateStore.markGameAsOver();
             return;
         }
-        this.gameStateStore.updateGameBoard(aiMove[0], aiMove[1], 'computer');
+        this.gameStateStore.updateGameBoard(aiMove[0], aiMove[1]);
         if (!this.checkForWinner()) {
-            this.gameStateStore.updateNextPlayer();
+            if (!this.checkForTie()) {
+                this.gameStateStore.updateNextPlayer();
+            }
+            else {
+                this.gameStateStore.markGameAsOver();
+                setTimeout(this.announceTie(), 500);
+            }
         }
         else {
+            this.gameStateStore.markGameAsOver();
             alert("Winner: " + this.gameState.value.computerAs);
         }
     };
@@ -60,6 +71,8 @@ var GameFunctionsService = /** @class */ (function () {
     };
     GameFunctionsService.prototype.checkForWinner = function () {
         return this.checkRows() || this.checkCols() || this.checkDiags();
+    };
+    GameFunctionsService.prototype.checkForTie = function () {
     };
     GameFunctionsService.prototype.checkRows = function () {
         for (var i = 0; i < constants_1.Constants.NUM_ROWS; i++) {

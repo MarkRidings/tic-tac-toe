@@ -25,7 +25,6 @@ var CellComponent = /** @class */ (function () {
     CellComponent.prototype.ngOnInit = function () {
         var _this = this;
         this.gameStateSubscription = this.gameStateStore.getAsObservable().subscribe(function (state) {
-            console.log('in subscribe: ', state);
             switch (state.rows[_this.rowNumber][_this.colNumber]) {
                 case constants_1.Constants.PLAYER_X:
                     _this.cellValue = 'X';

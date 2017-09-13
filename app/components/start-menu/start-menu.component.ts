@@ -18,7 +18,7 @@ export class StartMenuComponent {
     startGame(): void {
         this.gameFunctionsService.startGame(this.gameType, this.aiDiff, this.humanAs);
     }
-
+    
     disableButton(): boolean {
         return !this.gameType || (this.gameType === Constants.SINGLE_PLAYER && (!this.aiDiff || !this.humanAs));
     }

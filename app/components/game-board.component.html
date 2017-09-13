@@ -6,6 +6,10 @@
                   [isCenter]="rowNum === 1"
                   [rowNumber]="rowNum">"
         </game-row>
+        <div *ngIf="gameOver">
+            <button class="btn btn-default" (click)="restartGame()">Play Again!</button>
+            <button class="btn btn-default" (click)="backToMenu()">Back to Menu</button>
+        </div>
     </div>
 </ng-template>
 
