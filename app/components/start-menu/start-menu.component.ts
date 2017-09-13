@@ -1,5 +1,6 @@
 import {Component} from '@angular/core';
 import {GameFunctionsService} from "../../services/game-functions.service";
+import {Constants} from "../../constants";
 
 @Component({
     selector: 'game-start-menu',
@@ -8,20 +9,21 @@ import {GameFunctionsService} from "../../services/game-functions.service";
 })
 
 export class StartMenuComponent {
-    public gameType: number;
+    public gameType: string;
     public aiDiff: string;
+    public humanAs: string;
 
     constructor(private gameFunctionsService: GameFunctionsService) { }
 
     startGame(): void {
-        this.gameFunctionsService.startGame(this.gameType, this.aiDiff);
+        this.gameFunctionsService.startGame(this.gameType, this.aiDiff, this.humanAs);
     }
 
     disableButton(): boolean {
-        return !this.gameType || (this.gameType == 1 && !this.aiDiff);
+        return !this.gameType || (this.gameType === Constants.SINGLE_PLAYER && (!this.aiDiff || !this.humanAs));
     }
 
     showAiMenu(): boolean {
-        return this.gameType && this.gameType == 1;
+        return this.gameType && this.gameType === Constants.SINGLE_PLAYER;
     }
 }

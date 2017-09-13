@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {Constants} from "../constants";
-import {GameFunctionsService} from "../services/game-functions.service";
+import {GameStateStore} from "../gameState.store";
 
 @Component({
     selector: 'game-board',
@@ -12,12 +12,12 @@ export class GameBoardComponent implements OnInit {
     public rowNumbers: number[];
     private gameInProgress: boolean = false;
 
-    constructor(private gameFunctionsService: GameFunctionsService) {
+    constructor(private gameStateStore: GameStateStore) {
         this.rowNumbers = Array(Constants.NUM_ROWS).fill().map((x, i) => i);
     }
 
     ngOnInit() {
-        this.gameFunctionsService.getGameState().subscribe(state => {
+        this.gameStateStore.getAsObservable().subscribe(state => {
             this.gameInProgress = state.currentPlayer !== Constants.NO_PLAYER;
         });
     }

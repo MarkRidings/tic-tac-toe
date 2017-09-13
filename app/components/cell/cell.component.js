@@ -12,9 +12,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = require("@angular/core");
 var game_functions_service_1 = require("../../services/game-functions.service");
 var constants_1 = require("../../constants");
+var gameState_store_1 = require("../../gameState.store");
 var CellComponent = /** @class */ (function () {
-    function CellComponent(gameFunctionsService) {
+    function CellComponent(gameFunctionsService, gameStateStore) {
         this.gameFunctionsService = gameFunctionsService;
+        this.gameStateStore = gameStateStore;
         this.isCenter = false;
         this.rowNumber = 0;
         this.colNumber = 0;
@@ -22,12 +24,13 @@ var CellComponent = /** @class */ (function () {
     }
     CellComponent.prototype.ngOnInit = function () {
         var _this = this;
-        this.gameStateSubscription = this.gameFunctionsService.getGameState().subscribe(function (state) {
+        this.gameStateSubscription = this.gameStateStore.getAsObservable().subscribe(function (state) {
+            console.log('in subscribe: ', state);
             switch (state.rows[_this.rowNumber][_this.colNumber]) {
                 case constants_1.Constants.PLAYER_X:
                     _this.cellValue = 'X';
                     break;
-                case constants_1.Constants.PLAYER_Y:
+                case constants_1.Constants.PLAYER_O:
                     _this.cellValue = 'O';
                     break;
                 case constants_1.Constants.NO_PLAYER:
@@ -37,7 +40,7 @@ var CellComponent = /** @class */ (function () {
         });
     };
     CellComponent.prototype.handleClick = function () {
-        this.gameFunctionsService.updateGameState(this.rowNumber, this.colNumber);
+        this.gameFunctionsService.makePlayerMove(this.rowNumber, this.colNumber);
     };
     __decorate([
         core_1.Input(),
@@ -57,7 +60,7 @@ var CellComponent = /** @class */ (function () {
             templateUrl: 'app/components/cell/cell.component.html',
             styleUrls: ['app/components/cell/cell.component.css']
         }),
-        __metadata("design:paramtypes", [game_functions_service_1.GameFunctionsService])
+        __metadata("design:paramtypes", [game_functions_service_1.GameFunctionsService, gameState_store_1.GameStateStore])
     ], CellComponent);
     return CellComponent;
 }());

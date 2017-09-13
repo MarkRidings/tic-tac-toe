@@ -2,6 +2,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {GameFunctionsService} from "../../services/game-functions.service";
 import {Subscription} from "rxjs/Subscription";
 import {Constants} from "../../constants";
+import {GameStateStore} from "../../gameState.store";
 
 @Component({
     selector: 'game-cell',
@@ -19,15 +20,17 @@ export class CellComponent implements OnInit {
 
     private cellValue: string = '';
 
-    constructor(private gameFunctionsService: GameFunctionsService) {}
+    constructor(private gameFunctionsService: GameFunctionsService, private gameStateStore: GameStateStore) {}
 
     ngOnInit() {
-        this.gameStateSubscription = this.gameFunctionsService.getGameState().subscribe(state => {
+        this.gameStateSubscription = this.gameStateStore.getAsObservable().subscribe(state => {
+            console.log('in subscribe: ', state);
+
             switch (state.rows[this.rowNumber][this.colNumber]) {
                 case Constants.PLAYER_X:
                     this.cellValue = 'X';
                     break;
-                case Constants.PLAYER_Y:
+                case Constants.PLAYER_O:
                     this.cellValue = 'O';
                     break;
                 case Constants.NO_PLAYER:
@@ -38,6 +41,6 @@ export class CellComponent implements OnInit {
     }
 
     handleClick() {
-        this.gameFunctionsService.updateGameState(this.rowNumber, this.colNumber);
+        this.gameFunctionsService.makePlayerMove(this.rowNumber, this.colNumber);
     }
 }

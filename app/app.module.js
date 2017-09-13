@@ -14,6 +14,8 @@ var row_component_1 = require("./components/row/row.component");
 var game_functions_service_1 = require("./services/game-functions.service");
 var start_menu_component_1 = require("./components/start-menu/start-menu.component");
 var forms_1 = require("@angular/forms");
+var computerAi_service_1 = require("./services/computerAi.service");
+var gameState_store_1 = require("./gameState.store");
 var AppModule = /** @class */ (function () {
     function AppModule() {
     }
@@ -30,7 +32,9 @@ var AppModule = /** @class */ (function () {
                 start_menu_component_1.StartMenuComponent
             ],
             providers: [
-                game_functions_service_1.GameFunctionsService
+                game_functions_service_1.GameFunctionsService,
+                computerAi_service_1.ComputerAiService,
+                gameState_store_1.GameStateStore
             ],
             bootstrap: [game_board_component_1.GameBoardComponent]
         })

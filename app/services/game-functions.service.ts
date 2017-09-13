@@ -1,75 +1,82 @@
-import {Observable} from "rxjs/Observable";
 import {Injectable} from "@angular/core";
 import {Constants} from "../constants";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {ComputerAiService} from "./computerAi.service";
+import {GameState, GameStateService} from "./gameState.service";
+import {GameStateStore} from "../gameState.store";
 
-class GameState {
-    gameType: number;
-    aiDiff: string;
-    currentPlayer: number;
-    rows: number[][];
-
-    constructor() {
-        this.gameType = 1;
-        this.aiDiff = '';
-        this.currentPlayer = Constants.NO_PLAYER;
-        this.rows = [];
-
-        for (let i = 0; i < Constants.NUM_ROWS; i++) {
-            const aux = [];
-            for (let j = 0; j < Constants.NUM_COLS; j++) {
-                aux.push(Constants.NO_PLAYER);
-            }
-            this.rows.push(aux);
-        }
-    }
-}
 
 @Injectable()
 export class GameFunctionsService {
 
-    private initialState: GameState;
-    private gameState: BehaviorSubject<GameState>;
+    constructor(private aiService: ComputerAiService, private gameStateStore: GameStateStore) { }
 
-    constructor() {
-        this.initialState = new GameState();
-        this.gameState = new BehaviorSubject<GameState>(this.initialState);
+    newGame() {
+        this.gameStateStore.refreshState(1, '', Constants.NO_PLAYER);
     }
 
-    getGameState(): Observable<iGameState> {
-        return this.gameState.asObservable();
+    startGame(gameType: number, aiDiff: string, humanAs: string) {
+        this.gameStateStore.refreshState(gameType, aiDiff, humanAs);
+
+        if (this.gameState.value.humanAs === Constants.PLAYER_O) {
+            this.makeAiMove();
+        }
     }
 
-    moveToNextPlayer(): void {
-        if (this.gameState.value.currentPlayer === Constants.PLAYER_X) {
-            this.gameState.value.currentPlayer = Constants.PLAYER_Y;
+    makePlayerMove(rowNumber: number, colNumber: number): void {
+        if (this.gameStateStore.isHumansTurn() && this.gameStateStore.isCellEmpty(rowNumber, colNumber)) {
+            this.gameStateStore.updateGameBoard(rowNumber, colNumber, 'human');
+
+            if (this.checkForWinner()) {
+                alert(`Winner: ${this.gameStateStore.getCurrentPlayer()}`);
+            }
+            else {
+                this.gameStateStore.updateNextPlayer();
+                this.makeAiMove();
+            }
+        }
+    }
+
+    makeAiMove(): void {
+        const aiMove = (this.gameStateStore.getAiDifficulty() === Constants.AI_EASY) ?
+            this.aiService.makeEasyMove(this.gameStateStore.getGameBoard()) :
+            this.aiService.makeHardMove(this.gameStateStore.getGameBoard());
+
+        if (aiMove[0] === -1) {
+            setTimeout(this.announceTie, 500);
+            return;
+        }
+
+        this.gameStateStore.updateGameBoard(aiMove[0], aiMove[1], 'computer');
+
+        if (!this.checkForWinner()) {
+            this.gameStateStore.updateNextPlayer();
         }
         else {
-            this.gameState.value.currentPlayer = Constants.PLAYER_X;
+            alert(`Winner: ${this.gameState.value.computerAs}`);
         }
-
-        this.gameState.next(this.gameState.value);
     }
 
-    lineCheck(line: number[]): boolean {
-        return line.filter(cell => cell !== Constants.NO_PLAYER && cell === line[0]).length === line.length;
+    announceTie() {
+        alert('We have a tie!');
+    }
+
+    checkForWinner(): boolean {
+        return this.checkRows() || this.checkCols() || this.checkDiags();
     }
 
     checkRows(): boolean {
         for (let i = 0; i < Constants.NUM_ROWS; i++) {
-            const row = this.gameState.value.rows[i];
-            if (this.lineCheck(row)) {
+            if (this.lineCheck(this.gameStateStore.getRow(i))) {
                 return true;
             }
         }
-
         return false;
     }
 
     checkCols(): boolean {
         for (let i = 0; i < Constants.NUM_COLS; i++) {
-            const cols = this.gameState.value.rows.map(row => row[i]);
-            if (this.lineCheck(cols)) {
+            const col = this.gameStateStore.getRows().map(row => row[i]);
+            if (this.lineCheck(col)) {
                 return true;
             }
         }
@@ -78,33 +85,13 @@ export class GameFunctionsService {
     }
 
     checkDiags(): boolean {
-        const diag1 = this.gameState.value.rows.map((row, index) => row[index]);
-        const diag2 = this.gameState.value.rows.map((row, index) => row[row.length-1-index]);
+        const diag1 = this.gameStateStore.getRows().map((row, index) => row[index]);
+        const diag2 = this.gameStateStore.getRows().map((row, index) => row[row.length-1-index]);
 
         return this.lineCheck(diag1) || this.lineCheck(diag2);
     }
 
-    checkForWinner(): boolean {
-        return this.checkRows() || this.checkCols() || this.checkDiags();
-    }
-
-    updateGameState(rowNumber: number, colNumber: number): void {
-        if (this.gameState.value.rows[rowNumber][colNumber] === Constants.NO_PLAYER) {
-            this.gameState.value.rows[rowNumber][colNumber] = this.gameState.value.currentPlayer;
-            if (!this.checkForWinner()) {
-                this.moveToNextPlayer();
-            }
-            else {
-                this.gameState.next(this.gameState.value);
-                alert(`Winner: ${this.gameState.value.currentPlayer}`);
-            }
-        }
-    }
-
-    startGame(gameType: number, aiDiff: String) {
-        this.gameState.value.currentPlayer = Constants.PLAYER_X;
-        this.gameState.value.gameType = gameType;
-        this.gameState.value.aiDiff = aiDiff;
-        this.gameState.next(this.gameState.value);
+    lineCheck(line: number[]): boolean {
+        return line.filter(cell => cell !== Constants.NO_PLAYER && cell === line[0]).length === line.length;
     }
 }

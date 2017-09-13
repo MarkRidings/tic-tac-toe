@@ -11,16 +11,16 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = require("@angular/core");
 var constants_1 = require("../constants");
-var game_functions_service_1 = require("../services/game-functions.service");
+var gameState_store_1 = require("../gameState.store");
 var GameBoardComponent = /** @class */ (function () {
-    function GameBoardComponent(gameFunctionsService) {
-        this.gameFunctionsService = gameFunctionsService;
+    function GameBoardComponent(gameStateStore) {
+        this.gameStateStore = gameStateStore;
         this.gameInProgress = false;
         this.rowNumbers = Array(constants_1.Constants.NUM_ROWS).fill().map(function (x, i) { return i; });
     }
     GameBoardComponent.prototype.ngOnInit = function () {
         var _this = this;
-        this.gameFunctionsService.getGameState().subscribe(function (state) {
+        this.gameStateStore.getAsObservable().subscribe(function (state) {
             _this.gameInProgress = state.currentPlayer !== constants_1.Constants.NO_PLAYER;
         });
     };
@@ -29,7 +29,7 @@ var GameBoardComponent = /** @class */ (function () {
             selector: 'game-board',
             templateUrl: 'app/components/game-board.component.html'
         }),
-        __metadata("design:paramtypes", [game_functions_service_1.GameFunctionsService])
+        __metadata("design:paramtypes", [gameState_store_1.GameStateStore])
     ], GameBoardComponent);
     return GameBoardComponent;
 }());
