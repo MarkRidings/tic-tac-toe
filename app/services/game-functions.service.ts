@@ -57,7 +57,7 @@ export class GameFunctionsService {
     }
 
     announceTie() {
-        alert('We have a tie!');
+        alert('Tie Game!');
     }
 
     checkForWinner(): boolean {

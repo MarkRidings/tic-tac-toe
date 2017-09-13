@@ -56,7 +56,7 @@ var GameFunctionsService = /** @class */ (function () {
         }
     };
     GameFunctionsService.prototype.announceTie = function () {
-        alert('We have a tie!');
+        alert('Tie Game!');
     };
     GameFunctionsService.prototype.checkForWinner = function () {
         return this.checkRows() || this.checkCols() || this.checkDiags();
